@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pembelajaran Barisan Aritmetika & Geometri</title>
+<style>
+    body { font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 0; padding: 20px; }
+    h1, h2 { text-align: center; color: #2c3e50; }
+    .section { background-color: #fff; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    input, button, select { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+    .output { margin-top: 10px; padding: 10px; background-color: #ecf0f1; border-radius: 5px; }
+</style>
+</head>
+<body>
+
+<h1>Belajar Barisan Aritmetika & Geometri</h1>
+
+<div class="section">
+    <h2>Eksplorasi Barisan</h2>
+    <p>Masukkan beberapa suku pertama, dan temukan apakah barisan itu aritmetika atau geometri!</p>
+    <input id="sequenceInput" placeholder="Masukkan suku dipisahkan koma, misal 2,4,6" />
+    <button onclick="analyzeSequence()">Analisis Barisan</button>
+    <div id="analysisOutput" class="output"></div>
+</div>
+
+<div class="section">
+    <h2>Kalkulator Barisan</h2>
+    <p>Hitung suku ke-n dan jumlah n suku</p>
+    <label>Pilih tipe barisan:</label>
+    <select id="sequenceType">
+        <option value="arithmetic">Aritmetika</option>
+        <option value="geometric">Geometri</option>
+    </select>
+    <input id="firstTerm" placeholder="Suku pertama (a)" />
+    <input id="differenceOrRatio" placeholder="Beda/rasio (d atau r)" />
+    <input id="nthTerm" placeholder="Suku ke-n (n)" />
+    <button onclick="calculateTerm()">Hitung</button>
+    <div id="calcOutput" class="output"></div>
+</div>
+
+<div class="section">
+    <h2>Aktivitas Bangun Pemahaman</h2>
+    <p>Coba tebak suku berikutnya dari barisan ini, lalu cek jawaban!</p>
+    <div id="quizContainer"></div>
+    <button onclick="generateQuiz()">Buat Barisan Baru</button>
+</div>
+
+<script>
+function analyzeSequence() {
+    const input = document.getElementById('sequenceInput').value;
+    const seq = input.split(',').map(Number);
+    let output = '';
+    if(seq.length < 2) {
+        output = 'Masukkan minimal dua suku.';
+    } else {
+        const diff = seq[1] - seq[0];
+        let isArithmetic = seq.every((v,i,a) => i===0 || v - a[i-1] === diff);
+
+        const ratio = seq[1]/seq[0];
+        let isGeometric = seq.every((v,i,a) => i===0 || v / a[i-1] === ratio);
+
+        if(isArithmetic) {
+            output += `Ini barisan aritmetika dengan beda ${diff}.<br>`;
+            output += `Suku berikutnya: ${seq[seq.length-1] + diff}`;
+        }
+        if(isGeometric) {
+            output += `Ini barisan geometri dengan rasio ${ratio}.<br>`;
+            output += `Suku berikutnya: ${seq[seq.length-1] * ratio}`;
+        }
+        if(!isArithmetic && !isGeometric) {
+            output = 'Barisan ini bukan aritmetika maupun geometri sederhana.';
+        }
+    }
+    document.getElementById('analysisOutput').innerHTML = output;
+}
+
+function calculateTerm() {
+    const type = document.getElementById('sequenceType').value;
+    const a = Number(document.getElementById('firstTerm').value);
+    const dOrR = Number(document.getElementById('differenceOrRatio').value);
+    const n = Number(document.getElementById('nthTerm').value);
+    let output = '';
+    if(type === 'arithmetic') {
+        const nth = a + (n-1)*dOrR;
+        const sum = n/2 * (2*a + (n-1)*dOrR);
+        output = `Suku ke-${n} = ${nth}<br>Jumlah ${n} suku pertama = ${sum}`;
+    } else {
+        const nth = a * Math.pow(dOrR, n-1);
+        const sum = dOrR === 1 ? a*n : a*(Math.pow(dOrR,n)-1)/(dOrR-1);
+        output = `Suku ke-${n} = ${nth}<br>Jumlah ${n} suku pertama = ${sum}`;
+    }
+    document.getElementById('calcOutput').innerHTML = output;
+}
+
+function generateQuiz() {
+    const a = Math.floor(Math.random()*5 + 1);
+    const d = Math.floor(Math.random()*5 + 1);
+    const type = Math.random() > 0.5 ? 'arithmetic' : 'geometric';
+    let sequence = [a];
+    for(let i=1; i<5; i++) {
+        sequence.push(type==='arithmetic' ? sequence[i-1]+d : sequence[i-1]*d);
+    }
+    const nextTerm = type === 'arithmetic' ? sequence[sequence.length-1] + d : sequence[sequence.length-1] * d;
+    const container = document.getElementById('quizContainer');
+    container.innerHTML = `<p>Barisan: ${sequence.join(', ')} , ...</p>
+    <input id='quizAnswer' placeholder='Suku berikutnya?'>
+    <button onclick='checkAnswer(${nextTerm}, "${type}")'>Cek Jawaban</button>
+    <div id='quizOutput' class='output'></div>`;
+}
+
+function checkAnswer(correct, type) {
+    const ans = Number(document.getElementById('quizAnswer').value);
+    const output = document.getElementById('quizOutput');
+    if(ans === correct) {
+        output.innerHTML = `✅ Benar! Anda memahami pola barisan ${type}.`;
+    } else {
+        output.innerHTML = `❌ Salah. Jawaban yang benar adalah ${correct}.`;
+    }
+}
+</script>
+
+</body>
+</html>
